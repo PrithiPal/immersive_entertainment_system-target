@@ -1,7 +1,7 @@
 # gaming-target
 
 
- 1. Go to `192.168.1.254`
+ 1. Go to [192.168.1.254](http://192.168.1.254/)
 
  2. Take note of that IP address that the beaglebone appears on under the list of devices
 
