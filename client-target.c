@@ -1,3 +1,9 @@
+#include "multicast.h"
+
+
+// being defined because of the following issue
+// https://stackoverflow.com/questions/5582211/what-does-define-gnu-source-imply
+// https://stackoverflow.com/questions/16927613/error-when-compiling-a-multicast-listener/42236615#42236615
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -7,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "multicast.h"
+
 
 int main(){
 	int socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
