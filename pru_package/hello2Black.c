@@ -3,10 +3,19 @@
 #include "resource_table_empty.h"
 #include "prugpio.h"
 
-#define	PRUN 1
+#define	PRUN 0
 
-volatile register unsigned int __R30;
-volatile register unsigned int __R31;
+volatile register unsigned int __R30; // output gpio register for prun=0
+volatile register unsigned int __R31; // input gpio register for prun=0
+
+// outputs on the pru1
+// these pins should already be in pruout mode. if not, set it like this
+// config-pin p9_27 pruout
+// config-pin p9_28 pruout
+
+#define P9_27 (1<<5)
+#define P9_28 (1<<3)
+uint32_t gpio = P9_27 | P9_28 ; 
 
 void main(void) {
 	int i;
@@ -17,19 +26,20 @@ void main(void) {
 	CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
 	for(i=0; i<10; i++) {
-		gpio1[GPIO_SETDATAOUT]   = USR3;			// The the USR3 LED on
+		
+		gpio1[GPIO_SETDATAOUT]   = USR2;// The the USR3 LED on
+		//gpio1[GPIO_CLEARDATAOUT] = USR2;
+		
+		__R30 |= gpio;		// Set the GPIO pin high
+
+		__delay_cycles(500000000/100);    // Wait 1/2 second
+
 		gpio1[GPIO_CLEARDATAOUT] = USR2;
+        //gpio1[GPIO_SETDATAOUT]   = USR2;
 		
-		//__R30 |= gpio;		// Set the GPIO pin to 1
+		__R30 &= ~gpio;		// Clearn the GPIO pin
 
-		__delay_cycles(500000000/5);    // Wait 1/2 second
-
-		gpio1[GPIO_CLEARDATAOUT] = USR3;
-        gpio1[GPIO_SETDATAOUT]   = USR2;
-		
-		//__R30 &= ~gpio;		// Clearn the GPIO pin
-
-		__delay_cycles(500000000/5); 
+		__delay_cycles(500000000/100); 
 
 	}
 	__halt();

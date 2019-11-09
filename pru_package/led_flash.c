@@ -12,7 +12,7 @@ void main(void){
     button = 0x0008 ; // not taking into account the button yet.
     int i = 0 ; 
     while(!(__R31 && button)){
-        __R30 ^= led ; 
+        __R30 ^= led ; // set high
         __delay_cycles(500000000/100); 
         i=i+1 ; 
     }
