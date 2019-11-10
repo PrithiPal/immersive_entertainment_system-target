@@ -1,5 +1,39 @@
-#include "neoLightsColors.h"
 
+
+#include <stdint.h>
+#include <pru_cfg.h>
+#include "resource_table_empty.h"
+#include "prugpio.h"
+
+// VARIABLE DEFINITIONS ----- 
+
+#define STR_LEN 24
+#define NUM_LED_BITS 24 // these are colored bits to send.
+#define NUM_LEDS 64 // in Neomatrix. but this can change for other Adafruit neo versions .
+#define oneCyclesOn     700/5   // Stay on 700ns
+#define oneCyclesOff    800/5
+#define zeroCyclesOn    350/5
+#define zeroCyclesOff   600/5
+#define resetCycles     60000/5 // Must be at least 50u, use 60u
+#define out 1       // Bit number to output one
+
+#define TURN_ON_LED_NUM
+
+// Pruout pins we want to interact with
+// for testing purposes, you can join a simple bulb circuit to a spare pin
+// to test whether PRU is operating when start or stop.
+#define P9_27 (1<<5)
+#define P9_28 (1<<3)
+uint32_t gpio = P9_27 | P9_28 ;
+
+
+volatile register unsigned int __R30; // output gpio register for prun=0
+volatile register unsigned int __R31; // input gpio register for prun=0
+
+uint32_t *gpio1 = (uint32_t *)GPIO1;
+
+
+// FUNCTIONS DEFINITIONS ------ 
 
 void bit_on(void){
     __R30 |= gpio;      // Set the GPIO pin to 1
