@@ -29,6 +29,16 @@ volatile register unsigned int __R31; // input gpio register for prun=0
 
 uint32_t *gpio1 = (uint32_t *)GPIO1;
 
+// CUSTOM COLOR CODES 
+
+#define COLOR1 0x030200
+#define COLOR2 0x020300
+#define COLOR3 0x000203
+#define COLOR4 0x000302
+#define COLOR5 0x020003
+#define COLOR6 0x030002
+ 
+
 // FUNCTION DEFINITIONS 
 void TurnAllBlue(void);
 void TurnAllGreen(void);

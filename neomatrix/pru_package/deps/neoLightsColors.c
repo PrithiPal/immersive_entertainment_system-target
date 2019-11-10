@@ -50,7 +50,7 @@ void bit_off(void){
 
 void TurnAllBlue(void){
  
-    uint32_t custom_color = 0x00000f; // blue color 
+    uint32_t custom_color = 0x000f0f; // blue color 
     uint32_t color[64] ;
     
     int i, j, k;

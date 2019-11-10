@@ -15,8 +15,9 @@ void bit_off(void){
 }
 
 void TurnAllBlue(void){
- 
-    uint32_t custom_color = 0x00000f; // blue color 
+    
+
+    uint32_t custom_color = 0x020200; // blue color 
     uint32_t color[64] ;
     
     int i, j, k;
@@ -37,6 +38,33 @@ void TurnAllBlue(void){
 
         }
     }
+
+}
+
+void TurnAllCustom(uint32_t my_color){
+    
+    uint32_t custom_color = my_color; // blue color 
+    uint32_t color[64] ;
+    
+    int i, j, k;
+    for(k=0;k<64;k++){
+        color[k] = custom_color;
+    }
+
+    
+    for(j=0; j<64; j++) {
+        for(i=23; i>=0; i--) {
+            // logic to enable which leds to lit up.
+            if(color[j] & (0x1<<i)) {
+                bit_on();
+            }
+            else {
+                bit_off();
+            }
+
+        }
+    }
+
 }
 
 void TurnAllGreen(void){
