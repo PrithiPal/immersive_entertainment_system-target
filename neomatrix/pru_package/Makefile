@@ -10,16 +10,19 @@
 # PRU_SUPPORT points to pru-software-support-package.
 # GEN_DIR points to where to put the generated files.
 
-$(warning TARGET=$(TARGET), PRUN=$(PRUN), MODEL=$(MODEL))
-
+$(warning TARGET=$(TARGET), PRUN=$(PRUN), MODEL=$(MODEL), DEPS=$(DEPS))
+$(PRU_C_DIR)=.
+## GIT_DIR is the link to the Beaglebone cookbook where it can find common/write_init_pin.sh 
+## and other files 
 GIT_DIR:=/mnt/remote/myApps/PRUCookbook
+DEPS_DIR:=/mnt/remote/myApps/code/pru_package/deps
 PRU_CGT:=/usr/share/ti/cgt-pru
 PRU_SUPPORT:=/usr/lib/ti/pru-software-support-package
 GEN_DIR:=/tmp/pru$(PRUN)-gen
 
 LINKER_COMMAND_FILE=AM335x_PRU.cmd
 LIBS=--library=$(PRU_SUPPORT)/lib/rpmsg_lib.lib
-INCLUDE=--include_path=$(PRU_SUPPORT)/include --include_path=$(PRU_SUPPORT)/include/am335x --include_path=../../common
+INCLUDE=--include_path=$(PRU_SUPPORT)/include --include_path=$(PRU_SUPPORT)/include/am335x --include_path=../../common --include_path=$(DEPS_DIR)
 
 STACK_SIZE=0x100
 HEAP_SIZE=0x100
@@ -76,17 +79,17 @@ start:
 
 install: $(GEN_DIR)/$(TARGET).out
 	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/$(CHIP)-pru$(PRUN)-fw'
-	sudo cp $(GEN_DIR)/$(TARGET).out /lib/firmware/$(CHIP)-pru$(PRUN)-fw
-
+	sudo cp $(GEN_DIR)/$(TARGET).out  /lib/firmware/$(CHIP)-pru$(PRUN)-fw
+	
 $(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
 	@echo 'LD	$^' 
-	@lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include $(LFLAGS) -o $@ $^ $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
+	@lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include -i$(GIT_DIR)/docs/common/ -i$(DEPS_DIR) $(LFLAGS) -o $@ $^ $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
 
-$(GEN_DIR)/$(TARGET).obj: $(TARGET).c
+$(GEN_DIR)/$(TARGET).obj: $(TARGET).c $(DEPS)
 	@mkdir -p $(GEN_DIR)
-	@echo 'CC	$<'
-	@clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -D=PRUN=$(PRUN) -fe $@ $<
+	@echo 'CC	$^'
+	@clpru --include_path=$(PRU_CGT)/include --include_path=$(GIT_DIR)/docs/common/ --include_path=$(DEPS_DIR)  $(INCLUDE) $(CFLAGS) -D=PRUN=$(PRUN) -fe $@ $^
 
 clean:
-	@echo 'CLEAN	.    PRU $(PRUN)'
+	@echo 'CLEAN.PRU $(PRUN)'
 	@rm -rf $(GEN_DIR)
