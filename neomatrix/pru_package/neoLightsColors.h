@@ -3,13 +3,19 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <pru_cfg.h>
+#include "resource_table_0.h"
 #include "resource_table_empty.h"
 #include "prugpio.h"
+#include <pru_intc.h>
+#include <rsc_types.h>
+#include <pru_rpmsg.h>
 
 #endif
 
-// PRU Signal Information ---- 
+// PRU Signal Information ------------------------------------------- 
 #define oneCyclesOn     700/5   // Stay on 700ns
 #define oneCyclesOff    800/5
 #define zeroCyclesOn    350/5
@@ -17,8 +23,18 @@
 #define resetCycles     60000/5 // Must be at least 50u, use 60u
 #define out 1       // Bit number to output one
 
+// RPMsg_PRU Kernel driver information -----------------------------
+#define HOST_INT			((uint32_t) 1 << 30)
+#define TO_ARM_HOST			16	
+#define FROM_ARM_HOST		17
+#define CHAN_NAME			"rpmsg-pru"
+#define CHAN_DESC			"Channel 30"
+#define CHAN_PORT			30
+#define VIRTIO_CONFIG_S_DRIVER_OK	4
+char payload[RPMSG_BUF_SIZE];
 
-// GPIO Information ----- 
+// GPIO Information ------------------------------------------------
+
 // This should be enabled as pruout or pruin.
 #define P9_27 (1<<5) // pruout mode
 #define P9_28 (1<<3) // pruout mode
@@ -29,7 +45,7 @@ volatile register unsigned int __R31; // input gpio register for prun=0
 
 uint32_t *gpio1 = (uint32_t *)GPIO1;
 
-// NEOMATRIX 8*8 INFORMATION ---- 
+// NEOMATRIX 8*8 INFORMATION ---------------------------------------- 
 
 #define NUM_LED_BITS 24 // # bits to represent the color 
 #define NUM_LEDS 64 // in Neomatrix 8*8. but this can change for other Adafruit neo versions .
@@ -37,7 +53,7 @@ uint32_t *gpio1 = (uint32_t *)GPIO1;
 #define MAX_COLUMNS 8
 // MAX_ROWS * MAX_COLUMNS == NUM_LEDS always
 
-// COLOR INFORMATION ----- 
+// COLOR INFORMATION ------------------------------------------------ 
 
 #define TOTAL_NUM_COLORS 12
 
@@ -77,7 +93,7 @@ struct color_matrix  {
 }  ;
 
 
-// FUNCTION DEFINITIONS 
+// FUNCTION DEFINITIONS  ------------------------------------------------
 // Note : due to some reason, there are perfectly exported.
 // for instance, including this header file does not enable these
 // functions to be shared with the c file where header is included.
