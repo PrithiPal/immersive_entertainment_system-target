@@ -1,49 +1,37 @@
 #include "neoLightsColors.c"
-
+#include "prussdrv.h"
+#include "pruss_intc_mapping.h"
 
 // interact with this file
 // with arguments as macros
 // from Makefile.
 
-
 void main(void)
 {   
 
     CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
-
-    uint32_t color_palette[6]={
-        COLOR1,
-        COLOR2,
-        COLOR3,
-        COLOR4,
-        COLOR5,
-        COLOR6,
-    };
-
-    int i;
-    for(i=0;i<6;i++){
-        TurnOffAllLeds();
-        __delay_cycles(100000000);
-        TurnAllCustom(color_palette[i]);
-        __delay_cycles(100000000);
-    }
-
+    
     /*
-    int i;
-    for(i=0;i<20;i++){
+    char buff[255];
+    FILE *fp ; 
+    fp = fopen("simple.txt","r");
+    fscanf(fp,"%s",buff); 
+    */
+
+    uint32_t specific_color = buff;
+
+    while(1){
         TurnOffAllLeds();
         __delay_cycles(100000000);
-        TurnAllRed();
-        __delay_cycles(100000000);
-        TurnAllBlue();
-        __delay_cycles(100000000);
-        TurnAllGreen();
+        moveLED(specific_color);
         __delay_cycles(100000000);
         TurnOffAllLeds();
     }
-    */
+
     // this block(3 lines) should come in the end of the pru proces
     // shutting down the PRU.
+    
+    
     __R30 &= ~(gpio);   // Clear the GPIO pin
     __delay_cycles(resetCycles);
     __halt();
