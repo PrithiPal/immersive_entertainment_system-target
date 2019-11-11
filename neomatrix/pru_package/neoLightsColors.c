@@ -14,12 +14,97 @@ void bit_off(void){
     __delay_cycles(zeroCyclesOff-2);
 }
 
+
+// assumes that 1 <= r,c <= 8
+
+void moveLED(uint32_t specific_color){ 
+
+    int led_pos = 64 ; 
+    uint32_t color[NUM_LEDS] ;
+    int i, j, k;
+    // not an optimized method.
+
+    for(k=0;k<=led_pos;k++){
+        
+        color[k] = specific_color; 
+        
+    }
+
+    int l;
+    // led number selection
+    for(l=0;l<=64;l++){
+
+        for(k=0;k<=l;k++){
+            if(k==l){
+                color[k] = specific_color; 
+            }
+            else{
+                color[k] = 0x000000; 
+            }
+            
+        } 
+        
+        // single led
+        for(j=0; j<=l; j++) {
+            // all 24 bits
+            for(i=NUM_LED_BITS-1; i>=0; i--) {
+                // logic to enable which leds to lit up.
+                if(color[j] & (0x1<<i)) 
+                {
+                    bit_on();
+                }
+                else 
+                {
+                    bit_off();
+                }
+            }
+        }
+        __delay_cycles(10000000);
+    }
+}
+
+
+void TurnOnSpecificLED(const int r,const int c,const uint32_t specific_color){
+    int led_pos = 8*c + r ; 
+    uint32_t color[NUM_LEDS] ;
+    int i, j, k;
+    // not an optimized method.
+
+    for(k=0;k<=led_pos;k++){
+        if(!(k-led_pos)){
+            color[k] = specific_color; 
+        }
+        else
+        {
+            color[k] = 0x000000; // no color bit.
+        }
+        
+    }
+
+    for(j=0; j<=led_pos; j++) {
+        for(i=NUM_LED_BITS-1; i>=0; i--) {
+            // logic to enable which leds to lit up.
+            if(color[j] & (0x1<<i)) {
+                bit_on();
+            }
+            else {
+                bit_off();
+            }
+        }
+    }
+
+}
+
+
 void TurnAllBlue(void){
- 
-    uint32_t custom_color = 0x00000f; // blue color 
+    
+
+    uint32_t custom_color = 0x020200; // blue color 
     uint32_t color[64] ;
     
     int i, j, k;
+    
+    
     for(k=0;k<64;k++){
         color[k] = custom_color;
     }
@@ -37,6 +122,59 @@ void TurnAllBlue(void){
 
         }
     }
+
+}
+
+void TurnAllCustomColor(uint32_t my_color){
+    
+    uint32_t custom_color = my_color; // blue color 
+    uint32_t color[64] ;
+    
+    int i, j, k;
+    
+    for(k=0;k<64;k++){
+        color[k] = custom_color;
+    }
+
+    
+    for(j=0; j<64; j++) {
+        for(i=23; i>=0; i--) {
+            // logic to enable which leds to lit up.
+            if(color[j] & (0x1<<i)) {
+                bit_on();
+            }
+            else {
+                bit_off();
+            }
+
+        }
+    }
+
+}
+
+void DisplayAllColors(void){
+
+    int i;
+    for(i=0;i<TOTAL_NUM_COLORS;i++){
+        TurnOffAllLeds();
+        __delay_cycles(100000);
+        TurnAllCustomColor(color_palette[i]);
+        //__delay_cycles(100000000/2);
+    }
+
+}
+void DisplayColorSpectrum(void){
+
+    int i;
+    uint32_t color = 0x000001;
+    for(i=0;i<256*256*256;i++){
+        TurnOffAllLeds();
+        __delay_cycles(1000000);
+        TurnAllCustomColor(color);
+        color = color + 1 ; 
+        __delay_cycles(10000000);
+    }
+
 }
 
 void TurnAllGreen(void){
@@ -103,7 +241,6 @@ void TurnLEDColors(void){
             else {
                 bit_off();
             }
-
         }
     }
 }
@@ -112,26 +249,24 @@ void TurnLEDColors(void){
 void TurnOnAllLeds(void){
 
     uint32_t i;
-    for(i=0; i<STR_LEN*NUM_LEDS; i++) {
+    for(i=0; i<NUM_LEDS*NUM_LED_BITS; i++) {
 
         __R30 |= gpio;      // Set the GPIO pin to 1
         __delay_cycles(oneCyclesOn-1);
         __R30 &= ~(gpio);   // Clear the GPIO pin
         __delay_cycles(oneCyclesOff-2);
     
-    }
-    
+    } 
 }
+
 void TurnOffAllLeds(void){
-    
     uint32_t i;
     for(i=0; i<64*24; i++) {
         __R30 |= gpio;      // Set the GPIO pin to 1
         __delay_cycles(zeroCyclesOn-1);
         __R30 &= ~(gpio);   // Clear the GPIO pin
         __delay_cycles(zeroCyclesOff-2);
-    }
-    
+    }  
 }
 
 // pending : todo 

@@ -50,7 +50,7 @@ void bit_off(void){
 
 void TurnAllBlue(void){
  
-    uint32_t custom_color = 0x00000f; // blue color 
+    uint32_t custom_color = 0x000f0f; // blue color 
     uint32_t color[64] ;
     
     int i, j, k;
@@ -146,7 +146,7 @@ void TurnLEDColors(void){
 void TurnOnAllLeds(void){
 
     uint32_t i;
-    for(i=0; i<STR_LEN*NUM_LEDS; i++) {
+    for(i=0; i<NUM_LEDS*NUM_LED_BITS; i++) {
 
         __R30 |= gpio;      // Set the GPIO pin to 1
         __delay_cycles(oneCyclesOn-1);
