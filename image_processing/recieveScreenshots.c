@@ -84,15 +84,19 @@ int main(){
 			}
 		}
 	}
-	//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
-	char * topLeft, * topRight, * bottomLeft, * bottomRight;
-	topLeft = printSubString(message, 0, firstComma);
-	topRight = printSubString(message, firstComma+2, secondComma);
-	bottomLeft = printSubString(message, secondComma+2, thirdComma);
-	bottomRight = printSubString(message, thirdComma+2, fourthComma);
+	if (firstComma == 0){
+		printf("dominantColor : {%s} \n", message);
 
-	printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
+	}else{
+		//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
+		char * topLeft, * topRight, * bottomLeft, * bottomRight;
+		topLeft = printSubString(message, 0, firstComma);
+		topRight = printSubString(message, firstComma+2, secondComma);
+		bottomLeft = printSubString(message, secondComma+2, thirdComma);
+		bottomRight = printSubString(message, thirdComma+2, fourthComma);
 
+		printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
+	}
 	return 0;
 
 }
