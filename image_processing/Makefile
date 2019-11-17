@@ -1,4 +1,5 @@
 #compiler setup
+# image-processing
 
 GAMING_PC_EXECUTABLE = recieveScreenshots
 
@@ -20,7 +21,7 @@ all : $(recieve)
 
 % : %.c
 	mkdir -p $(OUTPUTDIR)
-	cp ../gaming-libraries/$(GAMING_PC_H_LIBRARIES) .
+	cp ../..//gaming-libraries/$(GAMING_PC_H_LIBRARIES) .
 	$(CC_C) $(CFLAGS) -o $(OUTPUTDIR)/$(GAMING_PC_EXECUTABLE) $<
 	rm $(GAMING_PC_H_LIBRARIES)
 
