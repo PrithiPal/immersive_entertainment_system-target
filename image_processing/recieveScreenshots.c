@@ -84,10 +84,21 @@ int main(){
 			}
 		}
 	}
-	if (firstComma == 0){
-		printf("dominantColor : {%s} \n", message);
+	
+	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");	
+	FILE *rgb_output_file = fopen(rgb_output_filename,"w+");
 
-	}else{
+	if(!rgb_output_file){
+		printf("File cannot be opened \n");
+	}
+
+	if (firstComma == 0){
+
+		printf("dominantColor : {%s} \n", message);
+		fprintf(rgb_output_file,"1\t%s\n",message);
+		
+	}
+	else{
 		//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
 		char * topLeft, * topRight, * bottomLeft, * bottomRight;
 		topLeft = printSubString(message, 0, firstComma);
@@ -96,7 +107,10 @@ int main(){
 		bottomRight = printSubString(message, thirdComma+2, fourthComma);
 
 		printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
+
+		fprintf(rgb_output_file,"0\t%s\t%s\t%s\t%s\n",topLeft,topRight,bottomLeft,bottomRight);
 	}
+	fclose(rgb_output_file);
 	return 0;
 
 }
