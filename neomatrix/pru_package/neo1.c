@@ -22,19 +22,19 @@ void run_through_pmsg_pru(void){
     while(1){
 
 
-        // this block is activated if new information has arrived
+        // this block is activated if new information has arrived. i.e 
+        // i.e something is written to the /dev/prumsg_pru30
         if (__R31 & HOST_INT) {
             CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
             while ( (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) & 0xf) {
                 
                 // parsing code comes here. 
                 char *ret;
-                int index;
-                index = atoi(payload);	
+               
                 ret = strchr(payload,' ');
                 specific_color = strtol(&ret[0],NULL,0) ; 
-        
 
+                // actual light code here.
                 TurnOffAllLeds();
                 __delay_cycles(10000000);
                 moveLED(specific_color);
@@ -46,9 +46,9 @@ void run_through_pmsg_pru(void){
                 //__halt();
             }
         }
+
+        // If nor information is received, keep doing stuff with the last information(specific_color)
         else{
-            
-            
                 TurnOffAllLeds();
                 __delay_cycles(10000000);
                 moveLED(specific_color);
@@ -64,6 +64,7 @@ void run_through_pmsg_pru(void){
 }
 
 void normal_lights(void){
+    
     CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
     uint32_t specific_color = 0x00ffff ;
@@ -85,6 +86,7 @@ void main(void)
 {   
     
     run_through_pmsg_pru();
+    //normal_lights();
     
 }
 // Turns off triggers
