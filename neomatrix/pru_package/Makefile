@@ -31,6 +31,19 @@ CFLAGS=-v3 -O2 --printf_support=minimal --display_error_number --endian=little -
 
 LFLAGS=--reread_libs --warn_sections --stack_size=$(STACK_SIZE) --heap_size=$(HEAP_SIZE) -m $(GEN_DIR)/$(TARGET).map
 
+
+## Neomatrix interface compiling options .. 
+CROSS_TOOL_INTERFACE = arm-linux-gnueabihf-
+CC_C_INTERFACE = $(CROSS_TOOL_INTERFACE)gcc
+##CFLAGS_INTERFACE = -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L -Werror 
+CFLAGS_INTERFACE = -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L
+NEOMATRIX_OUTOUTDIR=/mnt/remote/myApp
+
+## ENV VARIABLE declarations
+ENV_PRMSG_FILENAME="/dev/rpmsg_pru30"
+ENV_RGB_SCREENCAPTURE_FILE="$(HOME)/rgb_host.txt"
+
+
 # Check which model
 PRU_DIR="Invalid PRUN"
 ifeq ($(MODEL), AI)
@@ -61,19 +74,34 @@ endif
 
 $(warning CHIP=$(CHIP), PRU_DIR=$(PRU_DIR))
 
-all: stop install start
+all: setup neomatrix_interface install start   
 	@echo "MODEL   = $(MODEL)"
 	@echo "CHIP    = $(CHIP)"
 	@echo "PRUN    = $(PRUN)"
 	@echo "PRU_DIR = $(PRU_DIR)"
 
+setup : 
+	@echo "- Setup " 
+	./setup.sh
+	export PRMSG_FILENAME=$(ENV_PRMSG_FILENAME)
+	echo \'export RGB_SCREENCAPTURE_FILE=$(ENV_RGB_SCREENCAPTURE_FILE)\' | sudo tee -a ~/.bashrc
+	touch $(ENV_RGB_SCREENCAPTURE_FILE)
+	chmod 666 $(ENV_RGB_SCREENCAPTURE_FILE)
+
+## compiling arguments comes here.
+neomatrix_interface : 
+	$(CC_C_INTERFACE) $(CFLAGS_INTERFACE) $@.c $^ -o $(NEOMATRIX_OUTOUTDIR)/$@ -lpthread -lm
+
+## should be used manually. 
+## make stop to stop the PRU.
+## if stopped manually make sure that clearing message is sent to the prmsg.
 stop:
 	@echo "-    Stopping PRU $(PRUN)"
 	@echo stop | sudo tee $(PRU_DIR)/state 
 
 start:
 	@echo "-    Starting PRU $(PRUN)"
-	@echo start | sudo tee $(PRU_DIR)/state
+	echo start | sudo tee $(PRU_DIR)/state
 	@echo write_init_pins.sh
 	$(GIT_DIR)/docs/common/write_init_pins.sh /lib/firmware/$(CHIP)-pru$(PRUN)-fw
 
@@ -81,6 +109,7 @@ install: $(GEN_DIR)/$(TARGET).out
 	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/$(CHIP)-pru$(PRUN)-fw'
 	sudo cp $(GEN_DIR)/$(TARGET).out  /lib/firmware/$(CHIP)-pru$(PRUN)-fw
 	
+
 $(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
 	@echo 'LD	$^' 
 	@lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include -i$(GIT_DIR)/docs/common/ -i$(DEPS_DIR) $(LFLAGS) -o $@ $^ $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
