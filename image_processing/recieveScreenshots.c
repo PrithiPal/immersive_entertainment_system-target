@@ -95,7 +95,7 @@ int main(){
 	if (firstComma == 0){
 
 		printf("dominantColor : {%s} \n", message);
-		fprintf(rgb_output_file,"1\t%s\n",message);
+		fprintf(rgb_output_file,"1\t%s",message);
 		
 	}
 	else{
@@ -108,7 +108,7 @@ int main(){
 
 		printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
 
-		fprintf(rgb_output_file,"0\t%s\t%s\t%s\t%s\n",topLeft,topRight,bottomLeft,bottomRight);
+		fprintf(rgb_output_file,"0\t%s\t%s\t%s\t%s",topLeft,topRight,bottomLeft,bottomRight);
 	}
 	fclose(rgb_output_file);
 	return 0;
