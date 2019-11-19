@@ -49,8 +49,17 @@ int main(){
 		printf("the environment variable \"INTERFACE_ADDR\" has not been exported. Please read through README again\n.");
 		return -1;
 	}
+
 	mreq.imr_multiaddr.s_addr = inet_addr(MULTICAST_ADDR);
 	mreq.imr_interface.s_addr = inet_addr(s);
+
+	// File to write to so that neomatrix_interface can look and write to prmsg_pru30 driver file
+	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");	
+	FILE *rgb_output_file = fopen(rgb_output_filename,"w+");
+	if(!rgb_output_file){
+		printf("File cannot be opened \n");
+	}
+	
 	int setsockoptResponse = setsockopt(socketDescriptor, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 
 	printf("[client-target] setsockoptResponse: %d\n", setsockoptResponse);
@@ -64,6 +73,7 @@ int main(){
 
 	unsigned addrlen = sizeof (addr);
 
+	
 	ssize_t recvResponse = recvfrom(socketDescriptor, message, UDP_MESSAGE_SIZE, 0, (struct sockaddr *) &addr, &addrlen);
 
 	printf("[client-target] recvResponse: %d\n", recvResponse);
@@ -84,18 +94,12 @@ int main(){
 			}
 		}
 	}
-	
-	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");	
-	FILE *rgb_output_file = fopen(rgb_output_filename,"w+");
 
-	if(!rgb_output_file){
-		printf("File cannot be opened \n");
-	}
 
 	if (firstComma == 0){
 
 		printf("dominantColor : {%s} \n", message);
-		fprintf(rgb_output_file,"1\t%s",message);
+		fprintf(rgb_output_file,"1 %s",message);
 		
 	}
 	else{
@@ -108,7 +112,7 @@ int main(){
 
 		printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
 
-		fprintf(rgb_output_file,"0\t%s\t%s\t%s\t%s",topLeft,topRight,bottomLeft,bottomRight);
+		fprintf(rgb_output_file,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
 	}
 	fclose(rgb_output_file);
 	return 0;
