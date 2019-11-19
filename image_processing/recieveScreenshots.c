@@ -63,7 +63,8 @@ int main(){
 	message[UDP_MESSAGE_SIZE-1] = 0;
 
 	unsigned addrlen = sizeof (addr);
-
+	
+	while(1){
 	ssize_t recvResponse = recvfrom(socketDescriptor, message, UDP_MESSAGE_SIZE, 0, (struct sockaddr *) &addr, &addrlen);
 
 	printf("[client-target] recvResponse: %d\n", recvResponse);
@@ -111,6 +112,7 @@ int main(){
 		fprintf(rgb_output_file,"0\t%s\t%s\t%s\t%s\n",topLeft,topRight,bottomLeft,bottomRight);
 	}
 	fclose(rgb_output_file);
+	}
 	return 0;
 
 }
