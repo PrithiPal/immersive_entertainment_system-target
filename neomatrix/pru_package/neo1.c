@@ -134,30 +134,32 @@ void run_through_pmsg_pru(void){
     // shutting down the PRU. 
 }
 
-void normal_lights(void){
+
+void test_setlightbar(void){
     
-    CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
-
-    uint32_t specific_color = 0x00ffff ;
-
     TurnOffAllLeds();
-    __delay_cycles(100000000);
-    moveLED(specific_color);
-    __delay_cycles(100000000);
-    TurnOffAllLeds();
+    __delay_cycles(100000);
+    
+    int i ; 
+    for(i=1; i<=8;i++){
+        TurnOffAllLeds();
+        __delay_cycles(100000);
+        setLightBar(i,i);
+        __delay_cycles(100000000/2);
+        TurnOffAllLeds();
+    }
+    
 
-    __R30 &= ~(gpio);   // Clear the GPIO pin
-    __delay_cycles(resetCycles);
-    __halt();
-
+    //__R30 &= ~(gpio);   
+    //__delay_cycles(resetCycles);
 
 }
-
 
 void main(void)
 {   
     
-    run_through_pmsg_pru();
+    //run_through_pmsg_pru();
+    test_setlightbar();
     //normal_lights();
     //test_specific_led();
     //test_light_quadrant();
