@@ -80,17 +80,16 @@ all: setup neomatrix_interface install start
 	@echo "PRUN    = $(PRUN)"
 	@echo "PRU_DIR = $(PRU_DIR)"
 
-setup : 
-	@echo "- Setup " 
-	./setup.sh
-	export PRMSG_FILENAME=$(ENV_PRMSG_FILENAME)
-	echo \'export RGB_SCREENCAPTURE_FILE=$(ENV_RGB_SCREENCAPTURE_FILE)\' | sudo tee -a ~/.bashrc
-	touch $(ENV_RGB_SCREENCAPTURE_FILE)
-	chmod 666 $(ENV_RGB_SCREENCAPTURE_FILE)
-
 ## compiling arguments comes here.
 neomatrix_interface : 
 	$(CC_C_INTERFACE) $(CFLAGS_INTERFACE) $@.c $^ -o $(NEOMATRIX_OUTOUTDIR)/$@ -lpthread -lm
+
+setup : 
+	@echo "- Setup " 
+	./setup.sh
+	touch $(ENV_RGB_SCREENCAPTURE_FILE)
+	export RGB_SCREENCAPTURE_FILE=$(ENV_RGB_SCREENCAPTURE_FILE)
+
 
 ## should be used manually. 
 ## make stop to stop the PRU.
@@ -104,6 +103,9 @@ start:
 	echo start | sudo tee $(PRU_DIR)/state
 	@echo write_init_pins.sh
 	$(GIT_DIR)/docs/common/write_init_pins.sh /lib/firmware/$(CHIP)-pru$(PRUN)-fw
+	export PRMSG_FILENAME=$(ENV_PRMSG_FILENAME)
+	#sudo chmod 666 $(ENV_RGB_SCREENCAPTURE_FILE) 
+
 
 install: $(GEN_DIR)/$(TARGET).out
 	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/$(CHIP)-pru$(PRUN)-fw'

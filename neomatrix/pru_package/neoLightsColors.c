@@ -64,6 +64,59 @@ void moveLED(uint32_t specific_color){
 }
 
 
+void LightQuadrants(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4){
+    
+
+    uint32_t color[NUM_LEDS] ;
+    int i,j,k ; 
+    int lower_or_upper = NUM_LEDS / 2 ; 
+    for(k = 0 ; k < NUM_LEDS; k++){
+        
+        int k_mod = k % MAX_ROWS ; 
+        // upper
+        if(k < lower_or_upper){
+            // top-left
+            if(k_mod >=0 && k_mod <4){
+                color[k] = color1 ; 
+            }
+            // top-right
+            else if(k_mod >=4 && k_mod <8){
+                color[k] = color2 ; 
+            }
+        }
+        // lower
+        else if(k >= lower_or_upper){
+
+            // bottom-left
+            if(k_mod >=0 && k_mod <4){
+                color[k] = color3 ; 
+            }
+            // bottom-right
+            else if(k_mod >=4 && k_mod <8){
+                color[k] = color4 ; 
+            }     
+            
+        }
+        
+    }
+
+    for(j=0; j<NUM_LEDS; j++) {
+        for(i=NUM_LED_BITS-1; i>=0; i--) {
+            // logic to enable which leds to lit up.
+            if(color[j] & (0x1<<i)) {
+                bit_on();
+            }
+            else {
+                bit_off();
+            }
+        }
+    }
+
+
+
+}
+
+
 void TurnOnSpecificLED(const int r,const int c,const uint32_t specific_color){
     int led_pos = 8*c + r ; 
     uint32_t color[NUM_LEDS] ;
@@ -246,6 +299,31 @@ void TurnLEDColors(void){
 }
 
 
+void test_specific_led(void){
+    uint32_t specific_color = 0xffffff; 
+
+    TurnOffAllLeds();
+    __delay_cycles(1000000);
+    TurnOnSpecificLED(1,1,specific_color);
+    __delay_cycles(1000000000);
+    TurnOffAllLeds();  
+}
+
+void test_light_quadrant(void){
+    uint32_t color1 = 0x110000 ; 
+    uint32_t color2 = 0x001100 ; 
+    uint32_t color3 = 0x000011 ; 
+    uint32_t color4 = 0x111111 ; 
+
+    TurnOffAllLeds();
+    __delay_cycles(1000000);
+    LightQuadrants(color1,color2,color3,color4);
+    __delay_cycles(1000000000);
+    TurnOffAllLeds(); 
+
+
+}
+
 void TurnOnAllLeds(void){
 
     uint32_t i;
@@ -272,7 +350,7 @@ void TurnOffAllLeds(void){
 // pending : todo 
 // function not exported to header file.
 void StopForceNeoMatrix(void){
-    // step 1 : turn all led off.
-    // step 2 : stop the PRU unit running.
+    // step 1 : turn all led off. , send 0x000000 to each led (all 64)
+    // step 2 : stop the PRU unit running. i.e make PRUN=0 stop
     TurnOffAllLeds();
 }
