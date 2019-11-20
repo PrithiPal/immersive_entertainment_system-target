@@ -1,0 +1,53 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "gdb",
+			"request": "attach",
+			"name": "Attach to gdbserver",
+			"executable": "/home/prithipalsingh/cmpt433/public/myApp/sound_target",
+			"target": "192.168.7.2:2100",
+			"remote": true,
+			"cwd": "${workspaceRoot}", 
+			"gdbpath": "/usr/bin/gdb-multiarch"
+		},
+		{
+			"name": "C++ Launch",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "/home/prithipalsingh/cmpt433/public/myApps/sound_target",
+			"miDebuggerServerAddress": "192.168.7.2:2100",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "/home/prithipalsingh/cmpt433/public/myApps/",
+			"environment": [],
+			"externalConsole": true,
+			"linux": {
+			  "MIMode": "gdb"
+			},
+			"osx": {
+			  "MIMode": "gdb"
+			},
+			"windows": {
+			  "MIMode": "gdb"
+			}
+		  },
+		  {
+			"name": "receivedScreenShot cross-arch GDB",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "/home/prithipalsingh/cmpt433/public/myApp/recieveScreenshots",
+			"miDebuggerServerAddress": "192.168.7.2:1234",
+			"miDebuggerPath": "/usr/bin/gdb-multiarch",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "/home/prithipalsingh/cmpt433/public/myApps/",
+			"environment": [],
+			"externalConsole": true,
+		  }
+		
+	]
+}

@@ -12,7 +12,7 @@ void run_through_pmsg_pru(void){
     struct pru_rpmsg_transport transport;
 	uint16_t src, dst, len;
 	volatile uint8_t *status;
-    uint32_t specific_color = 0xffffff ;
+    //uint32_t specific_color = 0x000001 ;
 
     CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
     status = &resourceTable.rpmsg_vdev.status;
@@ -20,6 +20,13 @@ void run_through_pmsg_pru(void){
     pru_rpmsg_init(&transport, &resourceTable.rpmsg_vring0, &resourceTable.rpmsg_vring1, TO_ARM_HOST, FROM_ARM_HOST);
     while (pru_rpmsg_channel(RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS);
     while(1){
+        
+
+        // these variables are shared between If and else statement
+        int index ; 
+        char *ret; 
+        uint32_t dominant_color;
+        uint32_t top_left, top_right, bottom_left, bottom_right ; 
 
 
         // this block is activated if new information has arrived. i.e 
@@ -29,31 +36,95 @@ void run_through_pmsg_pru(void){
             while ( (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) & 0xf) {
                 
                 // parsing code comes here. 
-                char *ret;
-               
-                ret = strchr(payload,' ');
-                specific_color = strtol(&ret[0],NULL,0) ; 
+                index = atoi(payload); 
+                
+                // 4 regions color mode chosen.
+                if(index==0){
+                    
+                    ret = strchr(payload,' ');
+                    top_left = strtol(&ret[1],NULL,0);
+                    ret = strchr(&ret[1],' ');
+                    top_right = strtol(&ret[1],NULL,0);
+                    ret = strchr(&ret[1],' ');
+                    bottom_left = strtol(&ret[1],NULL,0);
+                    ret = strchr(&ret[1],' ');
+                    bottom_right = strtol(&ret[1],NULL,0);
 
-                // actual light code here.
-                TurnOffAllLeds();
-                __delay_cycles(10000000);
-                moveLED(specific_color);
-                __delay_cycles(10000000);
-                TurnOffAllLeds();
+                    TurnOffAllLeds();
+                    __delay_cycles(100000);
+                    LightQuadrants(top_left,top_right,bottom_left,bottom_right);
+                    __delay_cycles(100000);
+                    TurnOffAllLeds();
+    
+                    
+                }
+                // 1 dominant color mode chosen.
+                else if(index==1){
+                    
 
-                __R30 &= ~(gpio);   // Clear the GPIO pin
-                __delay_cycles(resetCycles);
+                    ret = strchr(payload,' ');
+                    dominant_color = strtol(&ret[1],NULL,0);
+
+                    TurnOffAllLeds();
+                    __delay_cycles(100000);
+                    TurnAllCustomColor(dominant_color);
+                    __delay_cycles(100000);
+                    TurnOffAllLeds();
+
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
+                }
+
+                else{
+                    // the program should not reach here
+                    // debug if it does.
+                    
+
+                    ret = strchr(payload,' ');
+                    dominant_color = strtol(&ret[1],NULL,0);
+
+                   
+                    TurnOffAllLeds();
+                    __delay_cycles(1000000);
+                    moveLED(0xffffff); // white color
+                    __delay_cycles(1000000);
+                    TurnOffAllLeds();
+
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
+                }
+            
+
                 //__halt();
             }
         }
 
-        // If nor information is received, keep doing stuff with the last information(specific_color)
+        // If nor information is received, keep doing stuff with the last information
         else{
-                TurnOffAllLeds();
-                __delay_cycles(10000000);
-                moveLED(specific_color);
-                __delay_cycles(10000000);
-                TurnOffAllLeds();
+
+                
+                // 4 regions color mode chosen.
+                if(index==0){
+                    
+                    TurnOffAllLeds();
+                    __delay_cycles(10000);
+                    LightQuadrants(top_left,top_right,bottom_left,bottom_right);
+                    __delay_cycles(10000);
+                    TurnOffAllLeds();
+                    
+                }
+                // 1 dominant color mode chosen.
+                else if(index==1){
+
+                    TurnOffAllLeds();
+                    __delay_cycles(10000);
+                    TurnAllCustomColor(dominant_color);
+                    __delay_cycles(10000);
+                    TurnOffAllLeds();
+
+                }
+                
+                    
 
         }
     }
@@ -82,12 +153,14 @@ void normal_lights(void){
 
 }
 
+
 void main(void)
 {   
     
     run_through_pmsg_pru();
     //normal_lights();
-    
+    //test_specific_led();
+    //test_light_quadrant();
 }
 // Turns off triggers
 #pragma DATA_SECTION(init_pins, ".init_pins")
