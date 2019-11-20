@@ -41,7 +41,7 @@ void convert_rgb_to_grb(char rgb[] , char grb[] ){
         substring(rgb,blue,5,2);
         //printf("red = %s, green = %s, blue = %s\n",red,green,blue);
         
-        strcat(grb,"0x");
+       
         strcat(grb,green);
         strcat(grb,red);
         strcat(grb,blue);
@@ -69,7 +69,10 @@ void* read_rgb_file(void* dv){
         if(mode_num==0){
             
             char top_left[10], top_right[10], bottom_left[10], bottom_right[10] ; 
-            char grb_top_left[10], grb_top_right[10], grb_bottom_left[10], grb_bottom_right[10] ;  
+            char grb_top_left[10] = "";
+            char grb_top_right[10] = "";
+            char grb_bottom_left[10] = "";
+            char grb_bottom_right[10] = "";  
 
             //printf("[READ_THREAD] : mode number 0 selected \n ");
             fscanf(rgb_file,"%s",top_left);
@@ -84,7 +87,7 @@ void* read_rgb_file(void* dv){
             convert_rgb_to_grb(bottom_right,grb_bottom_right);
 
             char buff[1024];
-            sprintf(buff,"0 grb_top_left grb_top_right grb_bottom_left grb_bottom_right");
+            sprintf(buff,"0 0x%s 0x%s 0x%s 0x%s",grb_top_left,grb_top_right,grb_bottom_left,grb_bottom_right);
            
             write_output_buff(buff);
             //printf("[READ_THREAD] : GRB a = %s, b = %s, c = %s, d = %s\n",grb_top_left, grb_top_right, grb_bottom_left, grb_bottom_right);
@@ -101,7 +104,7 @@ void* read_rgb_file(void* dv){
             
             
             char buff[1024];
-            sprintf(buff,"1 %s",grb_dominant_color);
+            sprintf(buff,"1 0x%s",grb_dominant_color);
 
             //printf("[READ_THREAD] : Color in GRB = %s\n",grb_dominant_color);
             //printf("to write =  %s\n",buff);
@@ -156,8 +159,7 @@ void* write_prmsg_driver(void* dv){
             char write_cmd[MAX_RGB_BUFFER_SIZE];
             sprintf(write_cmd,"echo %s | sudo tee %s",local_buff,prmsg_device_filename);
             
-            
-            
+        
             printf("[WRITE_THREAD] : write_cmd = %s\n",write_cmd);
             system(write_cmd);
         

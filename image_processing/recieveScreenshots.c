@@ -52,13 +52,7 @@ int main(){
 
 	mreq.imr_multiaddr.s_addr = inet_addr(MULTICAST_ADDR);
 	mreq.imr_interface.s_addr = inet_addr(s);
-
-	// File to write to so that neomatrix_interface can look and write to prmsg_pru30 driver file
-	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");	
-	FILE *rgb_output_file = fopen(rgb_output_filename,"w+");
-	if(!rgb_output_file){
-		printf("File cannot be opened \n");
-	}
+	
 	
 	int setsockoptResponse = setsockopt(socketDescriptor, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 
@@ -72,49 +66,77 @@ int main(){
 	message[UDP_MESSAGE_SIZE-1] = 0;
 
 	unsigned addrlen = sizeof (addr);
-
 	
-	ssize_t recvResponse = recvfrom(socketDescriptor, message, UDP_MESSAGE_SIZE, 0, (struct sockaddr *) &addr, &addrlen);
+	// File to write to so that neomatrix_interface can look and write to prmsg_pru30 driver file
+	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");
+	
+	/*
+	FILE *rgb_output_file = fopen(rgb_output_filename,"w");
+	if(rgb_output_file==NULL){
+		printf("[client-target] File cannot be opened \n");
+	}
+	printf("RGB_SCREENCAPTURE_FILE  = %s \n",rgb_output_filename); 
+	*/
 
-	printf("[client-target] recvResponse: %d\n", recvResponse);
-	printf("[client-target] message recieved : \n{%s}\n", message);
+	char write_cmd[2048]  ;
+	char messageToWrite[1024] ;
+
+	while(1){
 
 
-	int firstComma = 0, secondComma = 0, thirdComma = 0, fourthComma = 0;
-	for (int i = 1; message[i] != 0; i++){
-		if (message[i] == ','){
-			if (firstComma == 0){
-				firstComma = i;
-			}else if (secondComma == 0){
-				secondComma = i;
-			}else if (thirdComma == 0){
-				thirdComma = i;
-			}else if (fourthComma == 0){
-				fourthComma = i;
+		ssize_t recvResponse = recvfrom(socketDescriptor, message, UDP_MESSAGE_SIZE, 0, (struct sockaddr *) &addr, &addrlen);
+
+		printf("[client-target] recvResponse: %d\n", recvResponse);
+		printf("[client-target] message recieved : \n{%s}\n", message);
+
+
+		int firstComma = 0, secondComma = 0, thirdComma = 0, fourthComma = 0;
+		for (int i = 1; message[i] != 0; i++){
+			if (message[i] == ','){
+				if (firstComma == 0){
+					firstComma = i;
+				}else if (secondComma == 0){
+					secondComma = i;
+				}else if (thirdComma == 0){
+					thirdComma = i;
+				}else if (fourthComma == 0){
+					fourthComma = i;
+				}
 			}
 		}
+
+
+		if (firstComma == 0){
+
+			printf("dominantColor : {%s} \n", message);
+			
+			//fprintf(rgb_output_file,"1 %s",message);
+			
+			sprintf(messageToWrite,"1 %s",message);
+			sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,rgb_output_filename);
+			system(write_cmd);
+			
+		}
+		else{
+			//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
+			char * topLeft, * topRight, * bottomLeft, * bottomRight;
+			topLeft = printSubString(message, 0, firstComma);
+			topRight = printSubString(message, firstComma+2, secondComma);
+			bottomLeft = printSubString(message, secondComma+2, thirdComma);
+			bottomRight = printSubString(message, thirdComma+2, fourthComma);
+
+			printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
+			
+			//fprintf(rgb_output_file,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
+			
+			sprintf(messageToWrite,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
+			sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,rgb_output_filename);
+			system(write_cmd);
+			
+		}
+
 	}
-
-
-	if (firstComma == 0){
-
-		printf("dominantColor : {%s} \n", message);
-		fprintf(rgb_output_file,"1 %s",message);
-		
-	}
-	else{
-		//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
-		char * topLeft, * topRight, * bottomLeft, * bottomRight;
-		topLeft = printSubString(message, 0, firstComma);
-		topRight = printSubString(message, firstComma+2, secondComma);
-		bottomLeft = printSubString(message, secondComma+2, thirdComma);
-		bottomRight = printSubString(message, thirdComma+2, fourthComma);
-
-		printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
-
-		fprintf(rgb_output_file,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
-	}
-	fclose(rgb_output_file);
+	//fclose(rgb_output_file);
 	return 0;
 
 }
