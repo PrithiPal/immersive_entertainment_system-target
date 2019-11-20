@@ -85,6 +85,26 @@ uint32_t color_palette[TOTAL_NUM_COLORS]={
         COLOR12,
 };
 
+ const int COL1 = {0|8|16|24|32|40|48|56} ; 
+ const int COL2 = {1|9|17|25|33|41|49|57} ; 
+ const int COL3 = {2|10|18|26|34|42|50|58} ; 
+ const int COL4 = {3|11|19|27|35|43|51|59} ; 
+ const int COL5 = {4|12|20|28|36|44|52|60} ; 
+ const int COL6 = {5|13|21|29|37|45|53|61} ; 
+ const int COL7 = {6|14|22|30|38|46|54|62} ; 
+ const int COL8 = {7|15|23|31|39|47|55|63} ;
+ 
+ const int ACOL1 = {0&8&16&24&32&40&48&56} ; 
+ const int ACOL2 = {1&9&17&25&33&41&49&57} ; 
+ const int ACOL3 = {2&10&18&26&34&42&50&58} ; 
+ const int ACOL4 = {3&11&19&27&35&43&51&59} ; 
+ const int ACOL5 = {4&12&20&28&36&44&52&60} ; 
+ const int ACOL6 = {5&13&21&29&37&45&53&61} ; 
+ const int ACOL7 = {6&14&22&30&38&46&54&62} ; 
+ const int ACOL8 = {7&15&23&31&39&47&55&63} ;
+
+
+
 // COLOR COORDINATES ON LED-MATRIX DEFINITION
 struct color_matrix  {
     uint32_t color; // 24-bit color
