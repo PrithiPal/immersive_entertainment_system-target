@@ -110,6 +110,45 @@ void* read_rgb_file(void* dv){
             //printf("to write =  %s\n",buff);
             write_output_buff(buff);
         }
+        // Audio Visulizer output from audioAverager.c
+        else if(mode_num == 2){
+            char buff[1024];
+
+            char val1[100] = "";
+            char val2[100] = "";
+            char val3[100] = "";
+            char val4[100] = "";
+            char val5[100] = "";
+            char val6[100] = "";
+            char val7[100] = "";
+            char val8[100] = "";
+
+
+            fscanf(rgb_file,"%s",val1);
+            fscanf(rgb_file,"%s",val2);
+            fscanf(rgb_file,"%s",val3);
+            fscanf(rgb_file,"%s",val4);
+            fscanf(rgb_file,"%s",val5);
+            fscanf(rgb_file,"%s",val6);
+            fscanf(rgb_file,"%s",val7);
+            fscanf(rgb_file,"%s",val8);
+
+
+            sprintf(buff,
+                    "2 %s %s %s %s %s %s %s %s",
+                    val1,
+                    val2,
+                    val3,
+                    val4,
+                    val5,
+                    val6,
+                    val7,
+                    val8
+                    );
+
+
+            write_output_buff(buff);
+        }
 
         fclose(rgb_file);
     }
