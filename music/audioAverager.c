@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #define SAMPLE_SIZE (sizeof(short)) 			// bytes per sample
 
 
@@ -9,10 +10,10 @@ typedef struct {
 	short *pData;
 } wavedata_t;
 
-#define SOUND_RECORD_COMMAND "arecord -f cd -D plughw:0,0 -d 1 test.wav"
+#define SOUND_RECORD_COMMAND "arecord -f cd -D plughw:1,0 -d 1 test.wav"
 
 #define THRESHOLD 150
-#define FAN_FILE "/mnt/remote/project/turnOnFan"
+#define FAN_FILE "/mnt/remote/myApp/turnOnFan"
 #define FAN_FILE_NAME_LENGTH 30
 #define OFF_VALUE 0
 #define ON_VALUE 1
@@ -21,7 +22,7 @@ void averager_printToFanFile(int VALUE_TO_WRITE);
 unsigned long long  averager_getAverageForFan(wavedata_t *pSound);
 
 
-#define WAVE_FILE_TO_READ_FROM "/mnt/remote/project/test.wav"
+#define WAVE_FILE_TO_READ_FROM "/mnt/remote/myApp/test.wav"
 #define WAVE_FILE_NAME_LENGTH 28
 int averager_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound);
 
@@ -32,7 +33,7 @@ void averager_createVisualizerFile(wavedata_t *pSound);
 void averager_printToVisualizerFile(int VALUE_TO_WRITE);
 
 
-#define STATUS_FILE_LOCATION "/mnt/remote/project/status"
+#define STATUS_FILE_LOCATION "/mnt/remote/myApp/status"
 #define PROGRAM_ON '1'
 static const char * statusFile;
 void averager_createStatusFile(int VALUE_TO_WRITE);
@@ -171,6 +172,7 @@ void averager_printToFanFile(int VALUE_TO_WRITE){
 }
 
 void averager_createVisualizerFile(wavedata_t *pSound){
+	
 	double bucket_size = pSound->numSamples;
 	bucket_size = bucket_size / NUMBER_OF_BUCKETS;
 	double fraction = bucket_size - ((long)bucket_size);
@@ -179,27 +181,50 @@ void averager_createVisualizerFile(wavedata_t *pSound){
 	}
 	unsigned long int count = 0;
 	unsigned long int sum;
-	averager_printToVisualizerFile(2);
+	
+	char messageToWrite[1024]=""; 
+
+	//averager_printToVisualizerFile(2);
+	
+	strcat(messageToWrite,"2");
+	
 	for (long sampleIndex = 0; sampleIndex <pSound->numSamples; sampleIndex++ ){
 		if (count == bucket_size){
+			
 			sum = sum / bucket_size;
 			printf("sum == %ld\n", sum);
 			if (sum > THRESHOLD_8){
-				averager_printToVisualizerFile(8);
+				//averager_printToVisualizerFile(8);
+				
+				strcat(messageToWrite," 8");
 			}else if (sum > THRESHOLD_7){
-				averager_printToVisualizerFile(7);
+				//averager_printToVisualizerFile(7);
+				strcat(messageToWrite," 7");
+
 			}else if (sum > THRESHOLD_6){
-				averager_printToVisualizerFile(7);
+				//averager_printToVisualizerFile(6);
+				strcat(messageToWrite," 6");
+
 			}else if (sum > THRESHOLD_5){
-				averager_printToVisualizerFile(5);
+				//averager_printToVisualizerFile(5);
+				strcat(messageToWrite," 5");
+
 			}else if (sum > THRESHOLD_4){
-				averager_printToVisualizerFile(4);
+				//averager_printToVisualizerFile(4);
+				strcat(messageToWrite," 4");
+
 			}else if (sum > THRESHOLD_3){
-				averager_printToVisualizerFile(3);
+				//averager_printToVisualizerFile(3);
+				strcat(messageToWrite," 3");
+				
 			}else if (sum > THRESHOLD_2){
-				averager_printToVisualizerFile(2);
+				//averager_printToVisualizerFile(2);
+				strcat(messageToWrite," 2");
+
 			}else{
-				averager_printToVisualizerFile(1);
+				//averager_printToVisualizerFile(1);
+				strcat(messageToWrite," 1");
+
 			}
 
 			count = 0;
@@ -207,14 +232,22 @@ void averager_createVisualizerFile(wavedata_t *pSound){
 		}
 		sum += pSound->pData[sampleIndex];
 		count++;
+
 	}
+
+	char write_cmd[2048]="" ; 
+	
+	sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,visualizerFile);
+	system(write_cmd);
+			
+
 
 }
 
 void averager_printToVisualizerFile(int VALUE_TO_WRITE){
+	
 
-
-	FILE * brightnessInput = fopen(visualizerFile, "a");
+	FILE * brightnessInput = fopen(visualizerFile, "w");
 	if (brightnessInput == NULL){
 		printf("ERROR opening %s\n", visualizerFile);
 		exit(1);
@@ -224,11 +257,12 @@ void averager_printToVisualizerFile(int VALUE_TO_WRITE){
 
 	fprintf(brightnessInput, "%d ", VALUE_TO_WRITE );
 	fclose(brightnessInput);
+
 }
 
 void averager_createStatusFile(int VALUE_TO_WRITE){
 
-
+	
 	FILE * brightnessInput = fopen(statusFile, "w");
 	if (brightnessInput == NULL){
 		printf("ERROR opening %s\n", statusFile);
