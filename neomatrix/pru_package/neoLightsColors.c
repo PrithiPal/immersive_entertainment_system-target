@@ -1,6 +1,26 @@
 #include "neoLightsColors.h"
 
 
+// FUNCTION DECLARATIONS ----------------------------------------
+void bit_on(void);
+void bit_off(void);
+void setLightBar(int col_num,int height);
+void normal_lights(void);
+void moveLED(uint32_t specific_color);
+void LightQuadrants(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4);
+void TurnOnSpecificLED(const int r,const int c,const uint32_t specific_color);
+void TurnAllBlue(void);
+void TurnAllCustomColor(uint32_t my_color);
+void DisplayAllColors(void);
+void DisplayColorSpectrum(void);
+void TurnAllGreen(void);
+void TurnAllRed(void); 
+void TurnLEDColors(void); 
+void TurnOffAllLeds(void); 
+void TurnOnAllLeds(void); 
+void StopForceNeoMatrix(void); 
+
+//--------------------------------------------------------------------------------
 void bit_on(void){
     __R30 |= gpio;      // Set the GPIO pin to 1
     __delay_cycles(oneCyclesOn-1);
@@ -14,19 +34,25 @@ void bit_off(void){
     __delay_cycles(zeroCyclesOff-2);
 }
 
-// 1 <col_num <8 and 8 < height < 1
+// 1 <= col_num <= 8 and 8 <= height <= 1
 void setLightBar(int col_num,int height){
 
     uint32_t color[NUM_LEDS] ;
     uint32_t specific_color = 0xffffff ; // later on make arg from function
     int i,j,k ; 
     int counter = 0 ; 
-
+    uint8_t r,g,b ; 
     int height_counter = 8 ; 
 
     for(k=0;k<NUM_LEDS;k++){
         
         if( ( (k==0) || (k==8) || (k==16) || (k==24) || (k==32) || (k==40) || (k==48) || (k==56) )  && (col_num == 1)  ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;
+            specific_color = g << 16 | r << 8 | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -34,6 +60,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==1) || (k==9) || (k==17) || (k==25) || (k==33) || (k==41) || (k==49) || (k==57) ) && (col_num == 2)  ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;
+            specific_color = g << 16 | r << 8 | b ;
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -41,6 +73,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==2) || (k==10) || (k==18) || (k==26) || (k==34) || (k==42) || (k==50) || (k==58)  ) && (col_num == 3) ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -48,6 +86,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==3) || (k==11) || (k==19) || (k==27) || (k==35) || (k==43) || (k==51) || (k==59) ) && (col_num == 4) ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -55,6 +99,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==4) || (k==12) || (k==20) || (k==28) || (k==36) || (k==44) || (k==52) || (k==60) )&& (col_num == 5) ){
+           
+            r = 0x00;
+            g = 0xff;
+            b = 0x00;
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -62,6 +112,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==5) || (k==13) || (k==21) || (k==29) || (k==37) || (k==45) || (k==53) || (k==61) ) && (col_num == 6) ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -69,6 +125,12 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==6) || (k==14) || (k==22) || (k==30) || (k==38) || (k==46) || (k==54) || (k==62) ) && (col_num == 7) ){
+            
+            r = 0x00;
+            g = 0x00;
+            b = 0xff;        
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
@@ -76,6 +138,13 @@ void setLightBar(int col_num,int height){
             height_counter--;
         }
         else if( ( (k==7) || (k==15) || (k==23) || (k==31) || (k==39) || (k==47) || (k==55) || (k==63) ) && (col_num == 8) ){
+            
+            r = 0xff;
+            g = 0x00;
+            b = 0x00;
+
+            specific_color = (g << 16) | (r << 8) | b ; 
+
             if(height_counter<=height){
                 color[k] = specific_color ; 
             }
