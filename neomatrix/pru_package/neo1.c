@@ -27,8 +27,9 @@ void run_through_pmsg_pru(void){
         char *ret; 
         uint32_t dominant_color;
         uint32_t top_left, top_right, bottom_left, bottom_right ; 
+        
         int val1,val2,val3,val4,val5,val6,val7,val8;
-        int val_array[8]; 
+
 
         // this block is activated if new information has arrived. i.e 
         // i.e something is written to the /dev/prumsg_pru30
@@ -57,6 +58,8 @@ void run_through_pmsg_pru(void){
                     __delay_cycles(100000);
                     TurnOffAllLeds();
     
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
                     
                 }
                 // 1 dominant color mode chosen.
@@ -76,6 +79,7 @@ void run_through_pmsg_pru(void){
                     __delay_cycles(resetCycles);
                 }
 
+                
                 else if(index == 2){
                     ret = strchr(payload,' ');
                        
@@ -94,47 +98,22 @@ void run_through_pmsg_pru(void){
                     val7 = strtol(&ret[1],NULL,0); 
                     ret = strchr(&ret[1],' ');
                     val8 = strtol(&ret[1],NULL,0); 
-
-                    val_array[0]=val1 ;
-                    val_array[1]=val2 ; 
-                    val_array[2]=val3 ;
-                    val_array[3]=val4 ;
-                    val_array[4]=val5 ;
-                    val_array[5]=val6 ;
-                    val_array[6]=val7 ;
-                    val_array[7]=val8 ;
                     
-                    int i;
-                    for(i=1; i<=8;i++){
-
-                        TurnOffAllLeds();
-                        __delay_cycles(10000);
-                        setLightBar(i,val_array[i]);
-                        __delay_cycles(10000);
-                        
-                    }
-
+                    int arr[8] = {val1,val2,val3,val4,val5,val6,val7,val8};
+                    TurnOffAllLeds();
+                    __delay_cycles(10000);
+                    setLightBarsAll(arr);
+                    __delay_cycles(1000000);
+                    TurnOffAllLeds();    
+                
+                }
+                
+                else{
+                __R30 &= ~(gpio);   
+                __delay_cycles(resetCycles);
 
                 }
-                else
-                {
-                    // the program should not reach here
-                    // debug if it does.
-                    
 
-                    ret = strchr(payload,' ');
-                    dominant_color = strtol(&ret[1],NULL,0);
-
-                   
-                    TurnOffAllLeds();
-                    __delay_cycles(1000000);
-                    moveLED(0xffffff); // white color
-                    __delay_cycles(1000000);
-                    TurnOffAllLeds();
-
-                    __R30 &= ~(gpio);   
-                    __delay_cycles(resetCycles);
-                }
             
 
                 //__halt();
@@ -166,21 +145,18 @@ void run_through_pmsg_pru(void){
 
                 }
                 // audioVisualization
-                else if(index == 2){
-                    int i ; 
-                    for(i=1; i<=8;i++){
-
-                        TurnOffAllLeds();
-                        __delay_cycles(10000);
-                        setLightBar(i,val_array[i]);
-                        __delay_cycles(10000);
-                        
-                    }
-
-
-                }
                 
+                else if(index == 2){
                     
+                    int myarr[8] = {val1,val2,val3,val4,val5,val6,val7,val8};
+                    TurnOffAllLeds();
+                    __delay_cycles(10000);
+                    setLightBarsAll(myarr);
+                    __delay_cycles(1000000);
+                    TurnOffAllLeds();     
+                    
+                }
+            
 
         }
     }
@@ -191,27 +167,7 @@ void run_through_pmsg_pru(void){
 }
 
 
-void test_setlightbar(void){
-    
-    int i ; 
-    while(1){
-    for(i=1; i<=8;i++){
 
-        TurnOffAllLeds();
-        __delay_cycles(10000);
-        setLightBar(i,i);
-        __delay_cycles(10000);
-        
-    }
-
-    }
-
-    
-
-    //__R30 &= ~(gpio);   
-    //__delay_cycles(resetCycles);
-
-}
 
 void main(void)
 {   
