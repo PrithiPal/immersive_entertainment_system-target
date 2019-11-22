@@ -42,17 +42,17 @@ char averager_readStatusFile();
 
 
 #define NUMBER_OF_BUCKETS 8
-#define THRESHOLD_2 50
-#define THRESHOLD_3 200
-#define THRESHOLD_4 300
-#define THRESHOLD_5 400
-#define THRESHOLD_6 500
-#define THRESHOLD_7 600
-#define THRESHOLD_8 800
- 
+#define THRESHOLD_2 600
+#define THRESHOLD_3 800
+#define THRESHOLD_4 1000
+#define THRESHOLD_5 1200
+#define THRESHOLD_6 1400
+#define THRESHOLD_7 1600
+#define THRESHOLD_8 1800
+
 //#include <limits.h>
 
-void print_sound(wavedata_t *pSound);
+
 
 int main(){
 	visualizerFile = getenv("RGB_SCREENCAPTURE_FILE");
@@ -70,12 +70,8 @@ int main(){
 		system(SOUND_RECORD_COMMAND);
 		wavedata_t hiHatFile;
 		if (averager_readWaveFileIntoMemory(WAVE_FILE_TO_READ_FROM, &hiHatFile) == 0){
-			
-			//print_sound(&hiHatFile);
-			
 			averager_processAverageForFan(averager_getAverageForFan(&hiHatFile));
 			averager_createVisualizerFile(&hiHatFile);
-			
 			averager_removeWaveFile();
 		}
 	}
@@ -143,15 +139,6 @@ int averager_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound){
 	}
 
 	return 0;
-}
-
-void print_sound(wavedata_t *pSound){
-	
-	// print 100 samples
-	for(int i = 0; i<100; i++){
-		printf("%d ", pSound->pData[i]);
-	}
-
 }
 
 void averager_removeWaveFile(){
