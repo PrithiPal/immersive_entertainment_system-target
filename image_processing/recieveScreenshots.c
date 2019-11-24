@@ -52,8 +52,8 @@ int main(){
 
 	mreq.imr_multiaddr.s_addr = inet_addr(MULTICAST_ADDR);
 	mreq.imr_interface.s_addr = inet_addr(s);
-
-
+	
+	
 	int setsockoptResponse = setsockopt(socketDescriptor, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 
 	printf("[client-target] setsockoptResponse: %d\n", setsockoptResponse);
@@ -66,20 +66,20 @@ int main(){
 	message[UDP_MESSAGE_SIZE-1] = 0;
 
 	unsigned addrlen = sizeof (addr);
-
+	
 	// File to write to so that neomatrix_interface can look and write to prmsg_pru30 driver file
 	const char* rgb_output_filename= getenv("RGB_SCREENCAPTURE_FILE");
-
-
+	
+	/*
 	FILE *rgb_output_file = fopen(rgb_output_filename,"w");
 	if(rgb_output_file==NULL){
 		printf("[client-target] File cannot be opened \n");
 	}
-	printf("RGB_SCREENCAPTURE_FILE  = %s \n",rgb_output_filename);
+	printf("RGB_SCREENCAPTURE_FILE  = %s \n",rgb_output_filename); 
+	*/
 
-
-	//char write_cmd[2048]  ;
-	//char messageToWrite[1024] ;
+	char write_cmd[2048]  ;
+	char messageToWrite[1024] ;
 
 	while(1){
 
@@ -89,87 +89,33 @@ int main(){
 		printf("[client-target] recvResponse: %d\n", recvResponse);
 		printf("[client-target] message recieved : \n{%s}\n", message);
 
-		if (message[0] == 'd'){
-			//dominantColor
-			char *dominantColor;
-			dominantColor = printSubString(message, 2,  strlen(message));
-			printf("dominantColor : {%s}\n", dominantColor);
-		}else if (message[0] == 'a' ){
-			char *average;
-			average = printSubString(message, 2,  strlen(message));
-			printf("average colors : {%s}\n", average);
-		}else if (message[0] == 'q' ){
-			printf("quadrant colors\n");
-			int firstSpace = 0, secondSpace = 0, thirdSpace = 0, fourthSpace = 0;
-			for (int i = 0; message[i] != 0 && fourthSpace == 0; i++){
-				if (message[i] == ' '){
-					if (firstSpace == 0){
-						firstSpace = i;
-					}else if (secondSpace == 0){
-						secondSpace = i;
-					}else if (thirdSpace == 0){
-						thirdSpace = i;
-					}else if (fourthSpace == 0){
-						fourthSpace = i;
-					}
-				}
-			}
-			char * topLeft, * topRight, * bottomLeft, * bottomRight;
-			topLeft = printSubString(message, firstSpace+1, secondSpace);
-			topRight = printSubString(message, secondSpace+1, thirdSpace);
-			bottomLeft = printSubString(message, thirdSpace+1, fourthSpace);
-			bottomRight = printSubString(message, fourthSpace+1, strlen(message));
-			printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
 
-		}
-
-		/*int firstSpace = 0, secondSpace = 0, thirdSpace = 0, fourthSpace = 0, fifthSpace = 0, sixthSpace = 0;
-		for (int i = 0; message[i] != 0 && sixthSpace == 0; i++){
-			if (message[i] == ' '){
-				if (firstSpace == 0){
-					firstSpace = i;
-				}else if (secondSpace == 0){
-					secondSpace = i;
-				}else if (thirdSpace == 0){
-					thirdSpace = i;
-				}else if (fourthSpace == 0){
-					fourthSpace = i;
-				}else if (fifthSpace == 0){
-					fifthSpace = i;
-				}else if (sixthSpace == 0){
-					sixthSpace = i;
+		int firstComma = 0, secondComma = 0, thirdComma = 0, fourthComma = 0;
+		for (int i = 1; message[i] != 0; i++){
+			if (message[i] == ','){
+				if (firstComma == 0){
+					firstComma = i;
+				}else if (secondComma == 0){
+					secondComma = i;
+				}else if (thirdComma == 0){
+					thirdComma = i;
+				}else if (fourthComma == 0){
+					fourthComma = i;
 				}
 			}
 		}
-
-		printf("firstSpace {%d} secondSpace {%d} thirdSpace {%d} fourthSpace {%d} fifthSpace {%d} sixthSpace {%d}\n", firstSpace, secondSpace, thirdSpace, fourthSpace, fifthSpace, sixthSpace);
-		char *AveragePixelOfWholeScreen, *DominantPixelOfWholeScreen, * topLeft, * topRight, * bottomLeft, * bottomRight;
-		AveragePixelOfWholeScreen = printSubString(message, firstSpace+1, secondSpace);
-		DominantPixelOfWholeScreen = printSubString(message, secondSpace+1, thirdSpace);
-		topLeft = printSubString(message, thirdSpace+1, fourthSpace);
-		topRight = printSubString(message, fourthSpace+1, fifthSpace);
-		bottomLeft = printSubString(message, fifthSpace+1, sixthSpace);
-		bottomRight = printSubString(message, sixthSpace+1, strlen(message));
-
-		printf("AveragePixelOfWholeScreen : {%s}, DominantPixelOfWholeScreen : {%s}, topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", AveragePixelOfWholeScreen, DominantPixelOfWholeScreen, topLeft, topRight, bottomLeft, bottomRight);
-
-		fprintf(rgb_output_file,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
-
-		sprintf(messageToWrite,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
-		sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,rgb_output_filename);
-		system(write_cmd);
 
 
 		if (firstComma == 0){
 
 			printf("dominantColor : {%s} \n", message);
-
+			
 			//fprintf(rgb_output_file,"1 %s",message);
-
+			
 			sprintf(messageToWrite,"1 %s",message);
 			sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,rgb_output_filename);
 			system(write_cmd);
-
+			
 		}
 		else{
 			//printf("firstComma : {%d}, secondComma : {%d}, thirdComma : {%d}, fourthComma : {%d} \n", firstComma, secondComma, thirdComma, fourthComma);
@@ -180,14 +126,14 @@ int main(){
 			bottomRight = printSubString(message, thirdComma+2, fourthComma);
 
 			printf("topLeft : {%s}, topRight : {%s}, bottomLeft : {%s}, bottomRight : {%s} \n", topLeft, topRight, bottomLeft, bottomRight);
-
+			
 			//fprintf(rgb_output_file,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
-
+			
 			sprintf(messageToWrite,"0 %s %s %s %s",topLeft,topRight,bottomLeft,bottomRight);
 			sprintf(write_cmd,"echo %s | tee %s ",messageToWrite,rgb_output_filename);
 			system(write_cmd);
-
-		}*/
+			
+		}
 
 	}
 	//fclose(rgb_output_file);
