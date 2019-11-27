@@ -12,7 +12,7 @@ typedef struct {
 
 #define SOUND_RECORD_COMMAND "arecord -f cd -D plughw:1,0 -d 1 test.wav"
 
-#define THRESHOLD 150
+#define THRESHOLD 500
 #define FAN_FILE "/mnt/remote/myApp/turnOnFan"
 #define FAN_FILE_NAME_LENGTH 30
 #define OFF_VALUE 0
