@@ -4,7 +4,8 @@
 // from Makefile.
 
 
-
+// this modules accepts the message passed to prmsg_pru30 kernel module
+// index =0 : 
 void run_through_pmsg_pru(void){
 
     CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
@@ -23,12 +24,14 @@ void run_through_pmsg_pru(void){
         
 
         // these variables are shared between If and else statement
+        // If statement : Get new information from Kernel Module
+        // Else statement : Uses variables which stores last information.
         int index ; 
         char *ret; 
-        uint32_t dominant_color;
-        uint32_t top_left, top_right, bottom_left, bottom_right ; 
+        uint32_t dominant_color; // single dominant color
+        uint32_t top_left, top_right, bottom_left, bottom_right ;  // four region colors 
         
-        int val1,val2,val3,val4,val5,val6,val7,val8;
+        int val1,val2,val3,val4,val5,val6,val7,val8; // audioVisualizer bar heights.(bar height is between 1 and 10).
 
 
         // this block is activated if new information has arrived. i.e 
@@ -38,9 +41,11 @@ void run_through_pmsg_pru(void){
             while ( (pru_rpmsg_receive(&transport, &src, &dst, payload, &len) == PRU_RPMSG_SUCCESS) & 0xf) {
                 
                 // parsing code comes here. 
+                // determines which mode is chosen
                 index = atoi(payload); 
                 
                 // 4 regions color mode chosen.
+                // format : 0 color1 color2 color3 color4
                 if(index==0){
                     
                     ret = strchr(payload,' ');
@@ -53,33 +58,28 @@ void run_through_pmsg_pru(void){
                     bottom_right = strtol(&ret[1],NULL,0);
 
                     TurnOffAllLeds();
-                    __delay_cycles(100000);
+                    __delay_cycles(10000);
                     LightQuadrants(top_left,top_right,bottom_left,bottom_right);
-                    __delay_cycles(100000);
+                    __delay_cycles(10000);
                     TurnOffAllLeds();
-    
-                    __R30 &= ~(gpio);   
-                    __delay_cycles(resetCycles);
                     
                 }
                 // 1 dominant color mode chosen.
+                // format : 1 color
                 else if(index==1){
                     
-
                     ret = strchr(payload,' ');
                     dominant_color = strtol(&ret[1],NULL,0);
 
                     TurnOffAllLeds();
-                    __delay_cycles(100000);
+                    __delay_cycles(10000000);
                     TurnAllCustomColor(dominant_color);
-                    __delay_cycles(100000);
-                    TurnOffAllLeds();
-
-                    __R30 &= ~(gpio);   
-                    __delay_cycles(resetCycles);
+                    __delay_cycles(10000000);
+                    //TurnOffAllLeds();
                 }
 
-                
+                // audioVisualizer mode chosen
+                // format : 2 val1 val2 val3 val4 val5 val6 val7 val8
                 else if(index == 2){
                     ret = strchr(payload,' ');
                        
@@ -103,17 +103,13 @@ void run_through_pmsg_pru(void){
                     TurnOffAllLeds();
                     __delay_cycles(10000);
                     setLightBarsAll(arr);
-                    __delay_cycles(1000000);
+                    __delay_cycles(10000);
                     TurnOffAllLeds();    
                 
                 }
-                
-                else{
-                __R30 &= ~(gpio);   
-                __delay_cycles(resetCycles);
 
-                }
-
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
             
 
                 //__halt();
@@ -121,6 +117,8 @@ void run_through_pmsg_pru(void){
         }
 
         // If nor information is received, keep doing stuff with the last information
+        // this else statement ensures that PRU is doing something in between getting any 
+        // updates from the neomatrix_interface
         else{
 
                 
@@ -141,21 +139,24 @@ void run_through_pmsg_pru(void){
                     __delay_cycles(10000);
                     TurnAllCustomColor(dominant_color);
                     __delay_cycles(10000);
-                    TurnOffAllLeds();
+                    //TurnOffAllLeds();
 
                 }
+
                 // audioVisualization
-                
                 else if(index == 2){
                     
                     int myarr[8] = {val1,val2,val3,val4,val5,val6,val7,val8};
+                    
                     TurnOffAllLeds();
                     __delay_cycles(10000);
                     setLightBarsAll(myarr);
-                    __delay_cycles(1000000);
+                    __delay_cycles(10000);
                     TurnOffAllLeds();     
                     
                 }
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
             
 
         }
@@ -166,11 +167,24 @@ void run_through_pmsg_pru(void){
     // shutting down the PRU. 
 }
 
+// just for testing purposes.
+// Turns on the Neomatrix with a custom color. specific_col
+void test_specific_color(void){
 
+    uint32_t specific_col = 0x0000ff;
+                    TurnOffAllLeds();
+                    __delay_cycles(10000);
+                    TurnAllCustomColor(specific_col);
+                    //__delay_cycles(100000000);
+                    TurnOffAllLeds();
 
+                    __R30 &= ~(gpio);   
+                    __delay_cycles(resetCycles);
+}
 
 void main(void)
 {   
+    //test_specific_color();
     
     run_through_pmsg_pru();
     //test_setlightbar();
