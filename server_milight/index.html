@@ -1,0 +1,281 @@
+<html>
+<head>
+  <title>Immersive Entertainment System- Dashboard</title>
+  <link rel="stylesheet" type="text/css" href="./stylesheets/style.css">
+  <link rel="stylesheet" type="text/css" href="./stylesheets/jquery-ui.min.css">
+</head>
+<body>
+  <div class="colorpicker" style="display:none" id="colorpicker1">
+    <canvas id="picker1" width="300" height="300"></canvas>
+    <div class="controls">
+      Zone-1 Color
+      <div><label>R</label> <input type="text" id="rVal1" disabled /></div>
+      <div><label>G</label> <input type="text" id="gVal1" disabled /></div>
+      <div><label>B</label> <input type="text" id="bVal1" disabled /></div>
+      <div><label>RGB</label> <input type="text" id="rgbVal1" disabled/></div>
+      <div><label>HEX</label> <input type="text" id="hexVal1" disabled /></div>
+      <div class="previewIN" id="previewIN1"></div>
+      <div id="brightSlider">
+      <label>Brightness</label><input type="range" min="0" max="100" value="100" class="slider" id="myRange1">
+      </div>
+    </div>
+  </div>
+  <h1>Immersive Entertainment System</h1>
+  <div class="controllers">
+
+    <div class="master">
+
+      <div class="switch">
+        <h2>Master</h2>
+        <input type="checkbox" name="toggle" id="zone0Master" onclick="zoneMaster(0)">
+
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone0Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone0ModeCheckbox" onclick="zoneMode(0)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone0Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone0"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone0Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+
+  <div class="master-controler" id="allControllers">
+    <div class="zone">
+      <h2>Bulb-1</h2>
+      <div class="switch">
+        <input type="checkbox" name="toggle" id="zone1Master" onclick="zoneMaster(1)">
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone1Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone1ModeCheckbox" onclick="zoneMode(1)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone1Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone1"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone1Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="zone">
+      <h2>Bulb-2</h2>
+      <div class="switch">
+        <input type="checkbox" name="toggle" id="zone2Master" onclick="zoneMaster(2)">
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone2Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone2ModeCheckbox" onclick="zoneMode(2)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone2Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone2"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone2Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="zone">
+      <h2>Bulb-3</h2>
+      <div class="switch">
+        <input type="checkbox" name="toggle" id="zone3Master" onclick="zoneMaster(3)">
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone3Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone3ModeCheckbox" onclick="zoneMode(3)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone3Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone3"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone3Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="zone">
+      <h2>Bulb-4</h2>
+      <div class="switch">
+        <input type="checkbox" name="toggle" id="zone4Master" onclick="zoneMaster(4)">
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone4Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone4ModeCheckbox" onclick="zoneMode(4)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone4Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone4"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone4Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="zone" id="PRUID">
+      <h2>PRU</h2>
+      <div class="switch">
+        <input type="checkbox" name="toggle" id="zone5Master" onclick="zoneMaster(5)">
+        <label for="toggle">
+          <i class="bulb">
+            <span class="bulb-center"></span>
+            <span class="filament-1"></span>
+            <span class="filament-2"></span>
+            <span class="reflections">
+              <span></span>
+            </span>
+            <span class="sparks">
+              <i class="spark1"></i>
+              <i class="spark2"></i>
+              <i class="spark3"></i>
+              <i class="spark4"></i>
+            </span>
+          </i>
+        </label>
+      </div>
+      <br>
+      <div id="zone5Mode" class="zoneMode">
+        <label class="rocker rocker-small">
+          <input type="checkbox" id="zone5ModeCheckbox" onclick="zoneMode(5)">
+          <span class="switch-left">AUTO</span>
+          <span class="switch-right">CUS</span>
+        </label>
+        <br>
+        <div id="zone5Custom">
+          <!-- preview element -->
+          <div class="preview" id="preview-zone5"></div>
+          <!-- colorpicker element -->
+        </div>
+        <div id="zone5Auto" style="display: none">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  </div>
+  <script src='/socket.io/socket.io.js' type='text/javascript'></script>
+  <script src='/javascript/jquery-3.4.1.min.js' type='text/javascript'></script>
+  <script src='javascript/jquery-ui.min.js' type='text/javascript'></script>
+  <script src='/javascript/buttonFunctions.js' type='text/javascript'></script>
+</body>
+</html>
