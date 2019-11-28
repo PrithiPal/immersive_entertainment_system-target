@@ -52,7 +52,7 @@ void convert_rgb_to_grb(char rgb[] , char grb[] ){
 }
 
 // thread function to continuously read values from the RGB_SCREENCAPTURE_FILE values.
-void* read_rgb_file(void* dv){
+void* read_rgb_file(void* dv) {
     printf("[READ_THREAD] : read_rgb_file Thread starting ... \n");
     // endlessly check for the ~/rgb_values.txt.
     while(1){
@@ -148,6 +148,23 @@ void* read_rgb_file(void* dv){
 
 
             write_output_buff(buff);
+        }
+        else if(mode_num == 3){
+            //printf("mode number 1 selected \n ");
+            char rgb_dominant_color[10],grb_dominant_color[10]=""; 
+            
+            fscanf(rgb_file,"%s",rgb_dominant_color);
+            //printf("[READ_THREAD] : %s contents = %s\n",rgb_output_filename,rgb_dominant_color);
+            convert_rgb_to_grb(rgb_dominant_color,grb_dominant_color);
+            
+            
+            char buff[1024];
+            sprintf(buff,"1 %s",grb_dominant_color);
+
+            //printf("[READ_THREAD] : Color in GRB = %s\n",grb_dominant_color);
+            //printf("to write =  %s\n",buff);
+            write_output_buff(buff);
+
         }
 
         fclose(rgb_file);

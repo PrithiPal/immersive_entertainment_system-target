@@ -81,6 +81,7 @@ all: setup neomatrix_interface install start
 	@echo "PRU_DIR = $(PRU_DIR)"
 
 ## compiling arguments comes here.
+## this files interfaces from other programs and interacts with the prmsg_pru30 kernel module.
 neomatrix_interface : 
 	$(CC_C_INTERFACE) $(CFLAGS_INTERFACE) $@.c $^ -o $(NEOMATRIX_OUTOUTDIR)/$@ -lpthread -lm
 
@@ -98,6 +99,7 @@ stop:
 	@echo "-    Stopping PRU $(PRUN)"
 	@echo stop | sudo tee $(PRU_DIR)/state 
 
+## starts the PRU, and start executing the TARGET.
 start:
 	@echo "-    Starting PRU $(PRUN)"
 	echo start | sudo tee $(PRU_DIR)/state
@@ -106,16 +108,17 @@ start:
 	export PRMSG_FILENAME=$(ENV_PRMSG_FILENAME)
 	#sudo chmod 666 $(ENV_RGB_SCREENCAPTURE_FILE) 
 
-
+## copies our PRU C program to /lib/firmware which PRU can access and run
 install: $(GEN_DIR)/$(TARGET).out
 	@echo '-	copying firmware file $(GEN_DIR)/$(TARGET).out to /lib/firmware/$(CHIP)-pru$(PRUN)-fw'
 	sudo cp $(GEN_DIR)/$(TARGET).out  /lib/firmware/$(CHIP)-pru$(PRUN)-fw
 	
-
+## links and creates executable for our PRU C program
 $(GEN_DIR)/$(TARGET).out: $(GEN_DIR)/$(TARGET).obj
 	@echo 'LD	$^' 
 	@lnkpru -i$(PRU_CGT)/lib -i$(PRU_CGT)/include -i$(GIT_DIR)/docs/common/ -i$(DEPS_DIR) $(LFLAGS) -o $@ $^ $(LINKER_COMMAND_FILE) --library=libc.a $(LIBS) $^
 
+## compiles our PRU C program
 $(GEN_DIR)/$(TARGET).obj: $(TARGET).c $(DEPS)
 	@mkdir -p $(GEN_DIR)
 	@echo 'CC	$^'
